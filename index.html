@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nebulex - Clicker Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #090621, #02010a);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 0;
+    }
+
+    #game-container {
+      z-index: 1;
+      text-align: center;
+    }
+
+    #score {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #8ed9ff;
+      text-shadow: 0 0 10px #3bc3ff;
+    }
+
+    #planet {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle at center, #3b3fe1, #191970);
+      border-radius: 50%;
+      border: 4px solid #5ff;
+      box-shadow: 0 0 50px 10px rgba(91, 255, 255, 0.5);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.1s;
+    }
+
+    #planet:active {
+      transform: scale(1.05);
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #7be3ff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #7be3ff;
+      animation: sparkle 0.8s ease-out forwards;
+    }
+
+    @keyframes sparkle {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(2) translateY(-30px);
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <div id="game-container">
+    <div id="score">Nebulite: 0</div>
+    <div id="planet"></div>
+  </div>
+
+  <script>
+    const scoreDisplay = document.getElementById('score');
+    const planet = document.getElementById('planet');
+    let score = 0;
+
+    planet.addEventListener('click', () => {
+      score++;
+      scoreDisplay.textContent = 'Nebulite: ' + score;
+
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+      sparkle.style.left = Math.random() * 180 + 'px';
+      sparkle.style.top = Math.random() * 180 + 'px';
+      planet.appendChild(sparkle);
+
+      setTimeout(() => {
+        sparkle.remove();
+      }, 800);
+    });
+
+    // Background animated galaxy lines
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let w, h;
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    let stars = Array.from({length: 100}, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      alpha: Math.random(),
+      speed: 0.5 + Math.random()
+    }));
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 1.5, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(255, 0, 255, ${star.alpha})`;
+        ctx.fill();
+        star.x += star.speed;
+        star.alpha += (Math.random() - 0.5) * 0.05;
+        if (star.x > w) star.x = 0;
+        if (star.alpha > 1) star.alpha = 1;
+        if (star.alpha < 0.2) star.alpha = 0.2;
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
